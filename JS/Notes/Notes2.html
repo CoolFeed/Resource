@@ -1,0 +1,253 @@
+<!DocumentType html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />   
+		<title></title>
+		<link rel="stylesheet" href="css/Notes.css" type="text/css" media="all" />
+	</head>
+	<body>
+		<header><p>Notes</p></header>
+		<div id="content">
+			<dl>
+				<dt>Daily <span class="addNewBtn"></span></dt>
+				<dd>
+					<ul>
+						<li>Daliy Plan</li>
+						<li>Monthly Plan</li>
+						<li>Work</li>
+						<li>Life</li>
+						<li>Others</li>
+						<li>Copy Rights</li>
+					</ul>
+				</dd>
+			</dl>
+			<div class="seperate"></div>
+			<dl>
+				<dt>Weekly</dt>
+				<dd>
+					<ul>
+						<li>白日依山尽</li>
+						<li>黄河入海流</li>
+						<li>欲穷千里目</li>
+						<li>更上一层楼</li>
+						<li>...</li>
+						<li>...</li>
+					</ul>
+				</dd>
+			</dl>
+			<div class="seperate"></div>
+			<dl>
+				<dt>Poem</dt>
+				<dd>
+					<ul>
+						<li>item1</li>
+						<li>item2</li>
+						<li>item3</li>
+						<li>item4</li>
+						<li>item5</li>
+						<li>item6</li>
+					</ul>
+				</dd>
+			</dl>
+			<div class="seperate" ></div>
+			<dl>
+				<dt>Life</dt>
+				<dd>
+					<ul>
+						<li>item1</li>
+						<li>item2</li>
+						<li>item3</li>
+						<li>item4</li>
+						<li>item5</li>
+						<li>item6</li>
+					</ul>
+				</dd>
+			</dl>
+			<div class="seperate"></div>
+			<dl>
+				<dt>山川</dt>
+				<dd>
+					<ul>
+						<li>item1</li>
+						<li>item2</li>
+						<li>item3</li>
+						<li>item4</li>
+						<li>item5</li>
+						<li>item6</li>
+					</ul>
+				</dd>
+			</dl>
+			<dl>
+				<dt>河流</dt>
+				<dd>
+					<ul>
+						<li>item1</li>
+						<li>item2</li>
+						<li>item3</li>
+						<li>item4</li>
+						<li>item5</li>
+						<li>item6</li>
+					</ul>
+				</dd>
+			</dl>
+			<div class="seperate"></div>
+			<dl>
+				<dt>理想</dt>
+				<dd>
+					<ul>
+						<li>item1</li>
+						<li>item2</li>
+						<li>item3</li>
+						<li>item4</li>
+						<li>item5</li>
+						<li>item6</li>
+					</ul>
+				</dd>
+			</dl>
+			<div class="seperate" ></div>
+			<dl>
+				<dt>生命</dt>
+				<dd>
+					<ul>
+						<li>item1</li>
+						<li>item2</li>
+						<li>item3</li>
+						<li>item4</li>
+						<li>item5</li>
+						<li>item6</li>
+					</ul>
+				</dd>
+			</dl>
+			<div class="seperate" ></div>
+			<dl>
+				<dt>绿洲</dt>
+				<dd>
+					<ul>
+						<li>item1</li>
+						<li>item2</li>
+						<li>item3</li>
+						<li>item4</li>
+						<li>item5</li>
+						<li>item6</li>
+					</ul>
+				</dd>
+			</dl>
+			<div class="seperate" ></div>
+			<dl>
+				<dt>思想</dt>
+				<dd>
+					<ul>
+						<li>item1</li>
+						<li>item2</li>
+						<li>item3</li>
+						<li>item4</li>
+						<li>item5</li>
+						<li>item6</li>
+					</ul>
+				</dd>
+			</dl>
+			<dl>
+				<dt>追求</dt>
+				<dd>
+					<ul>
+						<li>item1</li>
+						<li>item2</li>
+						<li>item3</li>
+						<li>item4</li>
+						<li>item5</li>
+						<li>item6</li>
+					</ul>
+				</dd>
+			</dl>
+			<div class="seperate" ></div>
+			<dl>
+				<dt>境界</dt>
+				<dd>
+					<ul>
+						<li>item1</li>
+						<li>item2</li>
+						<li>item3</li>
+						<li>item4</li>
+						<li>item5</li>
+						<li>item6</li>
+					</ul>
+				</dd>
+			</dl>
+			<div class="seperate" ></div>
+			<dl>
+				<dt>后土</dt>
+				<dd>
+					<ul>
+						<li>item1</li>
+						<li>item2</li>
+						<li>item3</li>
+						<li>item4</li>
+						<li>item5</li>
+						<li>item6</li>
+					</ul>
+				</dd>
+			</dl>
+		</div>
+		<div class ="clear"></div>
+		<footer> <p>All Copy Right Resvered 2010-2013. Gerry On Line</p></footer>
+	</body>
+	<script type="text/javascript" src="http://www.mix-town.com/layouts/js/zh_cn/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="http://www.mix-town.com/layouts/js/zh_cn/jquery.plugin.min.js"></script>
+
+	<script>
+		(function($){
+					$.fn.extend( {
+							lightRotate: function( config, direction) {
+								if(direction === "left"){
+									direction = -1;
+								}else if(direction === "right"){
+									direction = 0;
+								}
+
+								$(this).rotate({
+										angle: (~~direction) === 0 ? config.from : 0 - config.from,
+										animateTo:(~~direction) === 0 ? config.to : 0 - config.to,
+										duration: config.duration,
+										easing:$.easing.easeInOutQuad,
+										callback:function(){
+											$(this).lightRotate(config, ~direction);
+										}
+								});
+							}
+						});
+						
+						config = { from: -15,
+								   to: 15,
+								   duration: 3000
+								  };
+							
+						$.each( $("dl"),function( index){
+								//$(this).lightRotate(config, (index%2===0)? "left":"right");
+							}
+						);
+			})(jQuery);
+		
+		function ReservedCode(){
+			$.each($("dl"), function(){
+					$this = $(this);
+					$this.on("click", function(){
+						$(this).toggle("slow", function(){
+							$(this).toggle("slow");
+						});
+					})
+				});
+			
+			$(".button").on("click", function(){
+							$this = $(this);
+							if($this.attr("value") === "Pause"){
+								$this.attr("value", "Start");
+								console.log($("img"));
+								$("img").stop(true,true).fadeOut();;
+							}else{
+								$this.attr("value", "Pause");
+							}
+						});
+		};
+	</script>
+	
+</html>

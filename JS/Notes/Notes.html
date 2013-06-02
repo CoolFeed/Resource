@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />   
+		<title>Notes</title>
+		<link rel="stylesheet" href="css/Notes.css" type="text/css" media="all" />
+	</head>
+	<body>
+		<header><p>Notes</p></header>
+		<section id="menu">
+			<ul>
+				<li id="new">New</li>
+				<li	id="edit">Edit</li>
+				<li id="delete">Delete</li>
+				<li id="save">Save</li>
+				<li id="config">Config</li>
+				<li id="help">Help</li>
+			</ul>
+		</section>
+		<section id="loading">
+			<span><img src="./images/loading.gif" alt="This Page is loading..." />
+			</span>
+		</section>
+		<script id="template" type="text/x-handlebars-template">
+			{{#each this}}
+			<dl data-expanded="false">
+				<dt>{{title}}<span class="expandedBtn"></span></dt>
+				<dd><div class="NoteContent">
+					{{{content}}}
+					</div>
+				</dd>
+			</dl>
+			{{#if seperate}}
+				<div class="seperate"></div>
+			{{/if}}
+			{{/each}}
+		</script>
+		<div id="content">
+
+		</div>
+		<div class ="clear"></div>
+		<footer> <p>All Copy Right Resvered 2010-2013. Gerry On Line</p></footer>
+	</body>
+	<script type="text/javascript" src="http://www.mix-town.com/layouts/js/zh_cn/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="http://www.mix-town.com/layouts/js/zh_cn/jquery.plugin.min.js"></script>
+	<script type="text/javascript"	src="https://raw.github.com/wycats/handlebars.js/1.0.0-rc.3/dist/handlebars.js"></script>
+	<script>
+		(function($){
+		
+			//loading the page
+			var source = $("#template").html();
+			var template = Handlebars.compile(source);
+			var context = [{title: "人物", content: "白日依山尽,<br/>黄河入海流,<br/>欲穷千里目,<br/>更上一层楼,<br/>..."},
+						   {title: "望岳", content: "岱宗夫如何,<br/>齐鲁青未了,<br/>造化钟神秀,<br/>阴阳割昏晓,<br/>荡胸生层云"},
+						   {title: "佳人", content: "决眦入归鸟,<br/>会当凌绝顶,<br/>一览众山小,<br/>白云无尽时,<br/>..."},
+						   {title: "送别", content: "下马饮君酒,<br/>君言不得意,<br/>归卧南山陲,<br/>问君何所之,<br/>但去莫复问"},
+						   {title: "望岳", content: "岱宗夫如何,<br/>齐鲁青未了,<br/>造化钟神秀,<br/>阴阳割昏晓,<br/>荡胸生层云"},
+						   {title: "人物", content: "白日依山尽,<br/>黄河入海流,<br/>欲穷千里目,<br/>更上一层楼,<br/>..."},
+						   {title: "望岳", content: "岱宗夫如何,<br/>齐鲁青未了,<br/>造化钟神秀,<br/>阴阳割昏晓,<br/>荡胸生层云"},
+						   {title: "佳人", content: "决眦入归鸟,<br/>会当凌绝顶,<br/>一览众山小,<br/>白云无尽时,<br/>..."},
+						   {title: "送别", content: "下马饮君酒,<br/>君言不得意,<br/>归卧南山陲,<br/>问君何所之,<br/>但去莫复问"},
+						   {title: "望岳", content: "岱宗夫如何,<br/>齐鲁青未了,<br/>造化钟神秀,<br/>阴阳割昏晓,<br/>荡胸生层云"},
+						   {title: "人物", content: "白日依山尽,<br/>黄河入海流,<br/>欲穷千里目,<br/>更上一层楼,<br/>..."},
+						   {title: "望岳", content: "岱宗夫如何,<br/>齐鲁青未了,<br/>造化钟神秀,<br/>阴阳割昏晓,<br/>荡胸生层云"},
+						   {title: "佳人", content: "决眦入归鸟,<br/>会当凌绝顶,<br/>一览众山小,<br/>白云无尽时,<br/>..."},
+						   {title: "送别", content: "下马饮君酒,<br/>君言不得意,<br/>归卧南山陲,<br/>问君何所之,<br/>但去莫复问"},
+						   {title: "望岳", content: "岱宗夫如何,<br/>齐鲁青未了,<br/>造化钟神秀,<br/>阴阳割昏晓,<br/>荡胸生层云"},
+						   {title: "人物", content: "白日依山尽,<br/>黄河入海流,<br/>欲穷千里目,<br/>更上一层楼,<br/>..."},
+						   {title: "望岳", content: "岱宗夫如何,<br/>齐鲁青未了,<br/>造化钟神秀,<br/>阴阳割昏晓,<br/>荡胸生层云"},
+						   {title: "佳人", content: "决眦入归鸟,<br/>会当凌绝顶,<br/>一览众山小,<br/>白云无尽时,<br/>..."},
+						   {title: "送别", content: "下马饮君酒,<br/>君言不得意,<br/>归卧南山陲,<br/>问君何所之,<br/>但去莫复问"},
+						   {title: "望岳", content: "岱宗夫如何,<br/>齐鲁青未了,<br/>造化钟神秀,<br/>阴阳割昏晓,<br/>荡胸生层云"},
+						   {title: "人物", content: "白日依山尽,<br/>黄河入海流,<br/>欲穷千里目,<br/>更上一层楼,<br/>..."},
+						   {title: "望岳", content: "岱宗夫如何,<br/>齐鲁青未了,<br/>造化钟神秀,<br/>阴阳割昏晓,<br/>荡胸生层云"},
+						   {title: "佳人", content: "决眦入归鸟,<br/>会当凌绝顶,<br/>一览众山小,<br/>白云无尽时,<br/>..."},
+						   {title: "送别", content: "下马饮君酒,<br/>君言不得意,<br/>归卧南山陲,<br/>问君何所之,<br/>但去莫复问"},
+						   {title: "望岳", content: "岱宗夫如何,<br/>齐鲁青未了,<br/>造化钟神秀,<br/>阴阳割昏晓,<br/>荡胸生层云"},
+						   {title: "人物", content: "白日依山尽,<br/>黄河入海流,<br/>欲穷千里目,<br/>更上一层楼,<br/>..."},
+						   {title: "望岳", content: "岱宗夫如何,<br/>齐鲁青未了,<br/>造化钟神秀,<br/>阴阳割昏晓,<br/>荡胸生层云"},
+						   {title: "佳人", content: "决眦入归鸟,<br/>会当凌绝顶,<br/>一览众山小,<br/>白云无尽时,<br/>..."},
+						   {title: "送别", content: "下马饮君酒,<br/>君言不得意,<br/>归卧南山陲,<br/>问君何所之,<br/>但去莫复问"},
+						   {title: "望岳", content: "岱宗夫如何,<br/>齐鲁青未了,<br/>造化钟神秀,<br/>阴阳割昏晓,<br/>荡胸生层云"}
+						   ];
+			context = plusSeperate(context);
+			var html = template(context);
+			$(content).append(html);
+			
+			$("#loading").hide();
+			
+			function plusSeperate(data){
+				var ret = new Array;;
+				$.each(data, function(index, obj){
+					if((index+1)%5 === 0){
+					}else{
+						obj.seperate = "true";
+					}
+					ret.push(obj);
+				})
+				return ret;
+			}
+			//end of loading the page
+			
+			//toggle click action
+			$.fn.extend( {
+				thrill: function( config, direction, times) {
+				if(times == undefined){
+					times = config.times;
+				}
+				
+				if(times === 0){
+					//stop thrilling and correct the shape
+					$(this).rotate({angle: 0, animateTo: 0, duration: config.duration, easing: $.easing.easeInOutQuad});
+					$(this).animate({width: "1200px", height: "400px"}, "slow");
+					return;
+				}
+			    if(direction === "left"){
+					direction = -1;
+				}else if(direction === "right"){
+					direction = 0;
+				}
+
+				$(this).rotate({
+						angle: (~~direction) === 0 ? config.from : 0 - config.from,
+						animateTo:(~~direction) === 0 ? config.to : 0 - config.to,
+						duration: config.duration,
+						easing:$.easing.easeInOutQuad,
+						callback:function(){
+							$(this).thrill(config, ~direction, times-1);
+						}
+				});
+				}
+			});
+			
+			config = { from: -3,
+				   to: 3,
+				   duration: 40,
+				   times: 20
+				  };
+		
+			//toggle click action
+			$.each($("#content dl dt span"), function(){
+				var $dls = $(this);
+				$dls.on("click", function(e){
+					var onlyShowNote = $(this).closest("dl");
+					var expanded = onlyShowNote.data("expanded");
+					//expand
+					if(expanded === false){
+						onlyShowNote.data("expanded", true);
+						onlyShowNote.find("dt span").attr("class", "collapseBtn");
+						$.each($("#content dl, .seperate"), function(){
+							var $otherDLS = $(this);
+							if($otherDLS.data("expanded") === true){
+							
+							}else {
+								$otherDLS.fadeOut(1000);
+							};
+						});
+						onlyShowNote.fadeIn();
+						onlyShowNote.thrill(config, "left", config.times);
+						onlyShowNote.find(".NoteContent").attr("contenteditable","true");
+						noteMiniHeight = onlyShowNote.css("height");
+						noteMiniWidth =  onlyShowNote.css("width");
+					//collapse
+					}else {
+						onlyShowNote.animate({width: noteMiniWidth, height: noteMiniHeight}, "slow");
+						onlyShowNote.find(".NoteContent").attr("contenteditable","false");
+						$.each($("#content dl, .seperate"), function(){
+							var $otherDLS = $(this);
+							if($otherDLS.data("expanded") === true) {
+								onlyShowNote.data("expanded", false);
+								onlyShowNote.find("dt span").attr("class", "expandedBtn");
+							}else {
+								$otherDLS.fadeIn(1000);
+							};
+						});
+					}
+				});
+			});
+			//end of toggle
+		})(jQuery);
+		
+	</script>
+	
+</html>
+
+
+
+

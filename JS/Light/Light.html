@@ -1,0 +1,101 @@
+<!DocumentType html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />   
+	<title>激光灯效果</title>
+	<link rel="stylesheet" href="css/light.css" type="text/css" media="all" />
+</head>
+<body>
+	<p>激光灯效果图</p>
+	<div id="button">
+		<input type="button" class="button" value="Pause"/>
+	</div>
+	<ul>
+		<li>
+			<div id="light1">
+				<img src="images/light.png">
+				</img>
+			</div>
+		</li>
+		
+		<li>
+			<div id="light2">
+				<img src ="images/light.png">
+				</img>
+			</div>
+		</li>
+		<li>
+			<div id="light3">
+				<img src ="images/light.png">
+				</img>
+			</div>
+		</li>
+		<li>
+			<div id="light4">
+				<img src ="images/light.png">
+				</img>
+			</div>
+		</li>
+		<li>
+			<div id="light5">
+				<img src ="images/light.png">
+				</img>
+			</div>
+		</li>
+		<li>
+			<div id="light6">
+				<img src ="images/light.png">
+				</img>
+			</div>
+		</li>
+	</ul>
+
+</body>
+<script type="text/javascript" src="http://www.mix-town.com/layouts/js/zh_cn/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="http://www.mix-town.com/layouts/js/zh_cn/jquery.plugin.min.js"></script>
+<script>
+   (function($){
+		$.fn.extend( {
+			lightRotate: function( config, direction) {
+			    if(direction === "left"){
+					direction = -1;
+				}else if(direction === "right"){
+					direction = 0;
+				}
+
+				$(this).rotate({
+						angle: (~~direction) === 0 ? config.from : 0 - config.from,
+						animateTo:(~~direction) === 0 ? config.to : 0 - config.to,
+						duration: config.duration,
+						easing:$.easing.easeInOutQuad,
+						callback:function(){
+							$(this).lightRotate(config, ~direction);
+						}
+				});
+			}
+		});
+		
+		config = { from: -45,
+				   to: 45,
+				   duration: 3000
+				  };
+			
+		$.each( $("img"),function( index){
+				$(this).lightRotate(config, (index%2===0)? "left":"right");
+			}
+		)
+
+		$(".button").on("click", function(){
+		    $this = $(this);
+			if($this.attr("value") === "Pause"){
+				$this.attr("value", "Start");
+				console.log($("img"));
+				$("img").stop(true,true).fadeOut();;
+			}else{
+				$this.attr("value", "Pause");
+			}
+		})
+	}
+   )(jQuery);
+</script>
+</html>

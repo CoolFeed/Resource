@@ -1,0 +1,32 @@
+body {
+	width: 600px;
+	height: 800px;
+	margin: auto;
+	background-color: #025634
+}
+
+p {
+	color: white;
+	margin-top: 80px;
+	margin-left: 250px;
+	padding: 20px;
+	width:100px;
+	border: solid;
+	background: #625634;
+}
+
+ul{
+	list-style: none;
+	margin-left: 200px;
+}
+
+li {
+	float: left;
+}
+
+#button{
+	position: relative;
+	margin-top: 20px;
+	margin-left: 300px;
+	
+}
