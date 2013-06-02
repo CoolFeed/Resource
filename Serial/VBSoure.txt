@@ -1,0 +1,1203 @@
+Dim delaytime As Integer
+Dim ASCII_SOH As String   '标题开始
+Dim ASCII_ENQ As String   '询问
+Dim ASCII_ACK As String   '承认
+Dim ASCII_NAK As String   '否定
+Dim ASCII_ETX As String   '本文结束
+Dim ASCII_SYN As String   '空转同步
+Dim stationNum As String  '站号
+Dim OUTdataA As String
+Dim OUTdataB As String
+Dim OUTdataC As String
+Dim OUTdataD As String
+Dim outbuff(0 To 7) As String '发送缓冲区
+Dim outdata(0 To 7) As String '发送区
+Dim inbuff() As Byte
+Dim indata As String
+Dim i As Integer
+Dim j As Integer
+Dim linkerrorcount As Integer
+Dim Textthingsave As String
+Dim thingtime As String
+Dim thing As String
+Dim f As Single
+Dim signmsg As Boolean
+Dim startsign As Boolean
+Dim offlinkSign As Boolean
+Dim lablinkSign As Boolean
+Dim LEDprocess As Byte
+Dim b(8) As Integer
+Dim yu(8) As Integer
+Dim ledback1 As Integer
+Dim ledback2 As Integer
+
+Public Sub record()
+
+  thingtime = Time()
+  Textthing.Text = thing + ">>" + thingtime + "^" & vbCrLf + Textthingsave
+  Textthingsave = Textthing.Text
+  
+End Sub
+Public Sub linkerror()
+  If linkerrorcount >= 2 Then
+    Call linkerrormsg
+    linkerrorcount = 0
+  Else
+    linkerrorcount = linkerrorcount + 1
+    Call resendFirstbyte
+  End If
+  
+End Sub
+Public Sub linkerrormsg()
+
+  lablink.ForeColor = QBColor(12)
+  lablink.Caption = "通信出错！"
+
+End Sub
+Private Sub CmdAllbright_Click()
+
+  Cmdpause.Value = True
+  
+  CmdL1bright.Enabled = False
+  CmdL2bright.Enabled = False
+  CmdL3bright.Enabled = False
+  CmdL4bright.Enabled = False
+  CmdL5bright.Enabled = False
+  CmdL6bright.Enabled = False
+  CmdL7bright.Enabled = False
+  CmdL8bright.Enabled = False
+  CmdL1die.Enabled = True
+  CmdL2die.Enabled = True
+  CmdL3die.Enabled = True
+  CmdL4die.Enabled = True
+  CmdL5die.Enabled = True
+  CmdL6die.Enabled = True
+  CmdL7die.Enabled = True
+  CmdL8die.Enabled = True
+  Call Clear_autoLED
+  
+  If MSComm1.PortOpen = True Then
+  '发送目标参数
+    OUTdataA = "W" '
+    OUTdataB = Chr(&H0)    '点亮LED^全亮
+    OUTdataC = Chr(&H0)    '高4位
+    OUTdataD = Chr(&H0)    '低4位
+    Call sendFirstbyte
+  Else
+    Exit Sub
+  End If
+End Sub
+Private Sub CmdAlldie_Click()
+
+  Cmdpause.Value = True
+
+  CmdL1bright.Enabled = True
+  CmdL2bright.Enabled = True
+  CmdL3bright.Enabled = True
+  CmdL4bright.Enabled = True
+  CmdL5bright.Enabled = True
+  CmdL6bright.Enabled = True
+  CmdL7bright.Enabled = True
+  CmdL8bright.Enabled = True
+  CmdL1die.Enabled = False
+  CmdL2die.Enabled = False
+  CmdL3die.Enabled = False
+  CmdL4die.Enabled = False
+  CmdL5die.Enabled = False
+  CmdL6die.Enabled = False
+  CmdL7die.Enabled = False
+  CmdL8die.Enabled = False
+  Call Clear_autoLED
+  
+  If MSComm1.PortOpen = True Then
+  '发送命令
+    OUTdataA = "W" '
+    OUTdataB = Chr(&H1)    '熄灭LED^全灭
+    OUTdataC = Chr(&HF)    '高4位
+    OUTdataD = Chr(&HF)    '低4位
+    Call sendFirstbyte
+  Else
+    Exit Sub
+  End If
+End Sub
+
+
+Private Sub CmdL1bright_Click()
+
+  CmdL1bright.Enabled = False
+  CmdL1die.Enabled = True
+  Call Clear_autoLED
+
+  If MSComm1.PortOpen = False Then
+    Exit Sub
+  Else
+  '发送命令
+  OUTdataA = "W" '
+  OUTdataB = Chr(&H0)   'L1亮
+  OUTdataC = Chr(&HF)   '高4位
+  OUTdataD = Chr(&HE)   '低4位
+  Call sendFirstbyte
+  End If
+End Sub
+
+Private Sub CmdL1die_Click()
+
+  CmdL1die.Enabled = False
+  CmdL1bright.Enabled = True
+  Call Clear_autoLED
+
+  If MSComm1.PortOpen = False Then
+    Exit Sub
+  Else
+  '发送命令
+  OUTdataA = "W" '
+  OUTdataB = Chr(&H1)    'L1灭
+  OUTdataC = Chr(&H0)    '高4位
+  OUTdataD = Chr(&H1)    '低4位
+  Call sendFirstbyte
+  End If
+End Sub
+
+Private Sub CmdL2bright_Click()
+
+  CmdL2bright.Enabled = False
+  CmdL2die.Enabled = True
+  Call Clear_autoLED
+
+  If MSComm1.PortOpen = False Then
+    Exit Sub
+  Else
+  '发送命令
+  OUTdataA = "W" '
+  OUTdataB = Chr(&H0)    'L2亮
+  OUTdataC = Chr(&HF)    '高4位
+  OUTdataD = Chr(&HD)    '低4位
+  Call sendFirstbyte
+  End If
+End Sub
+
+Private Sub CmdL2die_Click()
+
+  CmdL2die.Enabled = False
+  CmdL2bright.Enabled = True
+  Call Clear_autoLED
+
+  If MSComm1.PortOpen = False Then
+    Exit Sub
+  Else
+  '发送命令
+  OUTdataA = "W" '
+  OUTdataB = Chr(&H1)    'L2灭
+  OUTdataC = Chr(&H0)    '高4位
+  OUTdataD = Chr(&H2)    '低4位
+  Call sendFirstbyte
+  End If
+End Sub
+
+Private Sub CmdL3bright_Click()
+
+  CmdL3bright.Enabled = False
+  CmdL3die.Enabled = True
+  Call Clear_autoLED
+
+  If MSComm1.PortOpen = False Then
+    Exit Sub
+  Else
+  '发送命令
+  OUTdataA = "W" '
+  OUTdataB = Chr(&H0)    'L3亮
+  OUTdataC = Chr(&HF)    '高4位
+  OUTdataD = Chr(&HB)    '低4位
+  Call sendFirstbyte
+  End If
+End Sub
+
+Private Sub CmdL3die_Click()
+
+  CmdL3die.Enabled = False
+  CmdL3bright.Enabled = True
+  Call Clear_autoLED
+
+  If MSComm1.PortOpen = False Then
+    Exit Sub
+  Else
+  '发送命令
+  OUTdataA = "W" '
+  OUTdataB = Chr(&H1)    'L3灭
+  OUTdataC = Chr(&H0)    '高4位
+  OUTdataD = Chr(&H4)    '低4位
+  Call sendFirstbyte
+  End If
+End Sub
+
+Private Sub CmdL4bright_Click()
+
+  CmdL4bright.Enabled = False
+  CmdL4die.Enabled = True
+  Call Clear_autoLED
+
+  If MSComm1.PortOpen = False Then
+    Exit Sub
+  Else
+  '发送命令
+  OUTdataA = "W" '
+  OUTdataB = Chr(&H0)     'L4亮
+  OUTdataC = Chr(&HF)     '高4位
+  OUTdataD = Chr(&H7)     '低4位
+  Call sendFirstbyte
+  End If
+End Sub
+
+Private Sub CmdL4die_Click()
+
+  CmdL4die.Enabled = False
+  CmdL4bright.Enabled = True
+  Call Clear_autoLED
+
+  If MSComm1.PortOpen = False Then
+    Exit Sub
+  Else
+  '发送命令
+  OUTdataA = "W" '
+  OUTdataB = Chr(&H1)    'L4灭
+  OUTdataC = Chr(&H0)    '高4位
+  OUTdataD = Chr(&H8)    '低4位
+  Call sendFirstbyte
+  End If
+End Sub
+
+Private Sub CmdL5bright_Click()
+
+  CmdL5bright.Enabled = False
+  CmdL5die.Enabled = True
+  Call Clear_autoLED
+
+  If MSComm1.PortOpen = False Then
+    Exit Sub
+  Else
+  '发送命令
+  OUTdataA = "W" '
+  OUTdataB = Chr(&H0)     'L5亮
+  OUTdataC = Chr(&HE)     '高4位
+  OUTdataD = Chr(&HF)     '低4位
+  Call sendFirstbyte
+  End If
+End Sub
+
+Private Sub CmdL5die_Click()
+
+  CmdL5die.Enabled = False
+  CmdL5bright.Enabled = True
+  Call Clear_autoLED
+
+  If MSComm1.PortOpen = False Then
+    Exit Sub
+  Else
+  '发送命令
+  OUTdataA = "W" '
+  OUTdataB = Chr(&H1)    'L5灭
+  OUTdataC = Chr(&H1)    '高4位
+  OUTdataD = Chr(&H0)    '低4位
+  Call sendFirstbyte
+  End If
+End Sub
+
+Private Sub CmdL6bright_Click()
+
+  CmdL6bright.Enabled = False
+  CmdL6die.Enabled = True
+  Call Clear_autoLED
+
+  If MSComm1.PortOpen = False Then
+    Exit Sub
+  Else
+  '发送命令
+  OUTdataA = "W" '
+  OUTdataB = Chr(&H0)     'L6亮
+  OUTdataC = Chr(&HD)    '高4位
+  OUTdataD = Chr(&HF)    '低4位
+  Call sendFirstbyte
+  End If
+End Sub
+
+Private Sub CmdL6die_Click()
+
+  CmdL6die.Enabled = False
+  CmdL6bright.Enabled = True
+  Call Clear_autoLED
+
+  If MSComm1.PortOpen = False Then
+    Exit Sub
+  Else
+  '发送命令
+  OUTdataA = "W" '
+  OUTdataB = Chr(&H1)     'L6灭
+  OUTdataC = Chr(&H2)     '高4位
+  OUTdataD = Chr(&H0)     '低4位
+  Call sendFirstbyte
+  End If
+End Sub
+
+Private Sub CmdL7bright_Click()
+
+  CmdL7bright.Enabled = False
+  CmdL7die.Enabled = True
+  Call Clear_autoLED
+
+  If MSComm1.PortOpen = False Then
+    Exit Sub
+  Else
+  '发送命令
+  OUTdataA = "W" '
+  OUTdataB = Chr(&H0)    'L7亮
+  OUTdataC = Chr(&HB)    '高4位
+  OUTdataD = Chr(&HF)    '低4位
+  Call sendFirstbyte
+  End If
+End Sub
+
+Private Sub CmdL7die_Click()
+
+  CmdL7die.Enabled = False
+  CmdL7bright.Enabled = True
+  Call Clear_autoLED
+
+  If MSComm1.PortOpen = False Then
+    Exit Sub
+  Else
+  '发送命令
+  OUTdataA = "W" '
+  OUTdataB = Chr(&H1)    'L7灭
+  OUTdataC = Chr(&H4)    '高4位
+  OUTdataD = Chr(&H0)    '低4位
+  Call sendFirstbyte
+  End If
+End Sub
+
+Private Sub CmdL8bright_Click()
+
+  CmdL8bright.Enabled = False
+  CmdL8die.Enabled = True
+  Call Clear_autoLED
+
+  If MSComm1.PortOpen = False Then
+    Exit Sub
+  Else
+  '发送命令
+  OUTdataA = "W" '
+  OUTdataB = Chr(&H0)    'L8亮
+  OUTdataC = Chr(&H7)    '高4位
+  OUTdataD = Chr(&HF)    '低4位
+  Call sendFirstbyte
+  End If
+  
+End Sub
+
+Private Sub CmdL8die_Click()
+
+  CmdL8die.Enabled = False
+  CmdL8bright.Enabled = True
+  Call Clear_autoLED
+
+  If MSComm1.PortOpen = False Then
+    Exit Sub
+  Else
+  '发送命令
+  OUTdataA = "W" '
+  OUTdataB = Chr(&H1)    'L8灭
+  OUTdataC = Chr(&H8)    '高4位
+  OUTdataD = Chr(&H0)    '低4位
+  Call sendFirstbyte
+  End If
+  
+End Sub
+
+Private Sub Cmdflash_Click()
+  
+  Cmdsundry.Enabled = True
+  Cmdsundry.BackColor = &H8000000F
+  Cmdturn.Enabled = True
+  Cmdturn.BackColor = &H8000000F
+  Cmdflash.Enabled = False
+  Cmdflash.BackColor = QBColor(12)
+  Cmdpause.Enabled = True
+  '发送命令
+  OUTdataA = "W" '
+  OUTdataB = "F" '
+  OUTdataC = Chr(delaytime)
+  OUTdataD = "\"
+  Call sendFirstbyte
+  
+End Sub
+Private Sub Cmdsundry_Click()
+
+  Cmdflash.Enabled = True
+  Cmdflash.BackColor = &H8000000F
+  Cmdturn.Enabled = True
+  Cmdturn.BackColor = &H8000000F
+  Cmdsundry.Enabled = False
+  Cmdsundry.BackColor = QBColor(12)
+  Cmdpause.Enabled = True
+  '发送命令
+  OUTdataA = "W" '
+  OUTdataB = "S" '
+  OUTdataC = Chr(delaytime)
+  OUTdataD = "\"
+  Call sendFirstbyte
+  
+End Sub
+
+Private Sub Cmdturn_Click()
+
+  Cmdflash.Enabled = True
+  Cmdflash.BackColor = &H8000000F
+  Cmdsundry.Enabled = True
+  Cmdsundry.BackColor = &H8000000F
+  Cmdturn.Enabled = False
+  Cmdturn.BackColor = QBColor(12)
+  Cmdpause.Enabled = True
+  '发送命令
+  OUTdataA = "W" '
+  OUTdataB = "T" '
+  OUTdataC = Chr(delaytime)
+  OUTdataD = "\"
+  Call sendFirstbyte
+  
+End Sub
+Private Sub Cmdpause_Click()
+
+  Cmdpause.Enabled = False
+  Cmdflash.Enabled = True
+  Cmdflash.BackColor = &H8000000F
+  Cmdsundry.Enabled = True
+  Cmdsundry.BackColor = &H8000000F
+  Cmdturn.Enabled = True
+  Cmdturn.BackColor = &H8000000F
+  '发送命令
+  OUTdataA = "W" '
+  OUTdataB = "P" '
+  OUTdataC = "\"
+  OUTdataD = "\"
+  Call sendFirstbyte
+  
+End Sub
+Private Sub Cmdofflink_Click()
+
+  Cmdofflink.BackColor = QBColor(12)
+  Cmdofflink.Enabled = False
+  Cmdpause.Enabled = False
+  Cmdflash.Enabled = False
+  Cmdflash.BackColor = &H8000000F
+  Cmdsundry.Enabled = False
+  Cmdsundry.BackColor = &H8000000F
+  Cmdturn.Enabled = False
+  Cmdturn.BackColor = &H8000000F
+  '''''''''''''''发送命令
+  OUTdataA = "O"      '脱机首字符
+  OUTdataB = "\"      '脱机MCU的地址
+  OUTdataC = "\"      '待定
+  OUTdataD = "\"      '待定
+  Call sendFirstbyte
+  Timer3.Enabled = False
+  
+End Sub
+
+Private Sub cmdExit_Click()
+
+  If Cmdofflink.Enabled = True Then
+  
+    OUTdataA = "O"      '脱机首字符
+    OUTdataB = "\"      '脱机MCU的地址01H
+    OUTdataC = "\"      '待定
+    OUTdataD = "\"      '待定
+    Call sendFirstbyte
+  Else
+    End
+  End If
+End Sub
+
+Private Sub portswitch_Click()
+
+  If MSComm1.PortOpen = True Then
+     'MSComm1.PortOpen = False
+     portled.FillColor = QBColor(8)
+     portswitch.Caption = "打开串口"
+     thing = "关闭串口"
+     Call record
+     Timer3.Enabled = False
+     Cmdofflink.Enabled = False
+     Cmdofflink.Value = True
+     Cmdofflink.Enabled = False
+     Cmdturn.Enabled = False
+     Cmdsundry.Enabled = False
+     Cmdflash.Enabled = False
+     CmdAllbright.Enabled = False
+     CmdAlldie.Enabled = False
+     CmdL1bright.Enabled = False
+     CmdL1die.Enabled = False
+     CmdL2bright.Enabled = False
+     CmdL2die.Enabled = False
+     CmdL3bright.Enabled = False
+     CmdL3die.Enabled = False
+     CmdL4bright.Enabled = False
+     CmdL4die.Enabled = False
+     CmdL5bright.Enabled = False
+     CmdL5die.Enabled = False
+     CmdL6bright.Enabled = False
+     CmdL6die.Enabled = False
+     CmdL7bright.Enabled = False
+     CmdL7die.Enabled = False
+     CmdL8bright.Enabled = False
+     CmdL8die.Enabled = False
+     lablink.Caption = "连接断开！"
+     lablink.ForeColor = QBColor(6)
+     '增加发送命令通知MCU已关闭串口
+  Else
+     MSComm1.PortOpen = True
+     portled.FillColor = QBColor(10)
+     Cmdofflink.BackColor = &H8000000F
+     portswitch.Caption = "关闭串口"
+     thing = "打开串口"
+     Call record
+     Timer3.Enabled = True
+     Cmdofflink.Enabled = True
+     Cmdofflink.Enabled = True
+     Cmdpause.Enabled = True
+     Cmdturn.Enabled = True
+     Cmdsundry.Enabled = True
+     Cmdflash.Enabled = True
+     CmdAllbright.Enabled = True
+     CmdAlldie.Enabled = True
+     CmdL1bright.Enabled = True
+     CmdL1die.Enabled = True
+     CmdL2bright.Enabled = True
+     CmdL2die.Enabled = True
+     CmdL3bright.Enabled = True
+     CmdL3die.Enabled = True
+     CmdL4bright.Enabled = True
+     CmdL4die.Enabled = True
+     CmdL5bright.Enabled = True
+     CmdL5die.Enabled = True
+     CmdL6bright.Enabled = True
+     CmdL6die.Enabled = True
+     CmdL7bright.Enabled = True
+     CmdL7die.Enabled = True
+     CmdL8bright.Enabled = True
+     CmdL8die.Enabled = True
+     signmsg = False
+     '增加发送命令通知MCU已打开串口
+  End If
+  
+End Sub
+
+Private Sub relink_Click()
+
+  If MSComm1.PortOpen = True Then
+     MSComm1.PortOpen = False
+     Timer3.Enabled = False
+  End If
+  Cmdofflink.BackColor = &H8000000F
+  Cmdflash.Enabled = True
+  Cmdflash.BackColor = &H8000000F
+  Cmdsundry.Enabled = True
+  Cmdsundry.BackColor = &H8000000F
+  Cmdturn.Enabled = True
+  Cmdturn.BackColor = &H8000000F
+  Cmdpause.Enabled = False
+  CmdAllbright.Enabled = True
+  CmdAlldie.Enabled = True
+  Cmdofflink.Enabled = True
+  MSComm1.CommPort = 1
+  MSComm1.PortOpen = True
+  portled.FillColor = QBColor(10)
+  portswitch.Caption = "关闭串口"
+  ComboPort.ListIndex = 0 '显示“COM1”
+  thing = "重新启动连接！"
+  Call record
+  '发送命令
+  OUTdataA = "L"
+  OUTdataB = "\"
+  OUTdataC = "\"
+  OUTdataD = "\"
+  Call sendFirstbyte
+  Timer3.Enabled = True
+  signmsg = True
+End Sub
+Private Sub Cmdclear_Click()
+  Textthing.Text = ""
+  Textthingsave = ""
+  Cmdclear.Enabled = False
+  
+End Sub
+Private Sub ComboPort_Click()
+
+  If MSComm1.PortOpen = True Then
+    MSComm1.PortOpen = False
+    MSComm1.CommPort = ComboPort.ListIndex + 1
+    MSComm1.PortOpen = True
+  Else
+    MSComm1.CommPort = ComboPort.ListIndex + 1
+  End If
+End Sub
+
+Private Sub Form_Load()
+  
+  ASCII_SOH = Chr(&H1)    '标题开始
+  ASCII_ENQ = Chr(&H5)    '询问
+  ASCII_ACK = Chr(&H6)    '承认
+  ASCII_NAK = Chr(&H15)   '否定
+  ASCII_ETX = Chr(&H3)    '本文结束
+  ASCII_SYN = Chr(&H16)   '空转同步
+  stationNum = Chr(&H1)   'MCUA地址
+  signmsg = True
+  startsign = True
+  Timer1.Interval = 1000
+  Timer1.Enabled = True
+  delaytime = 2
+  Timer2.Interval = 100 '500
+  Timer2.Enabled = True
+  Timer3.Interval = 3000  ''''每3秒检查通信状态
+  Timer3.Enabled = True
+  'Timer4.Interval = 500   '500ms检测LED状态
+  'Timer4.Enabled = True
+  MSComm1.Settings = "9600,n,8,1"   ' 设置波特率和发送字符格式
+  MSComm1.CommPort = 1             ' 设置通讯串口
+  MSComm1.InputMode = comInputModeBinary  '以二进制方式读数据
+  MSComm1.InputLen = 0              ' 设置或返回一次从接收缓冲区中读取字节数，0表示一次读取所有数据
+  MSComm1.InBufferSize = 8 ''''''''' 设置接收缓冲区8 Byte
+  MSComm1.InBufferCount = 0
+  MSComm1.OutBufferSize = 8 '''''''''设置发送缓冲区8 Byte
+  MSComm1.OutBufferCount = 0
+  MSComm1.RThreshold = 1           ' 每个字符到接收缓冲区都触发接收事件
+  MSComm1.SThreshold = 1
+  '''''''''''''LED按钮初始化''''''''''''''''''
+  CmdL1die.Enabled = False
+  CmdL2die.Enabled = False
+  CmdL3die.Enabled = False
+  CmdL4die.Enabled = False
+  CmdL5die.Enabled = False
+  CmdL6die.Enabled = False
+  CmdL7die.Enabled = False
+  CmdL8die.Enabled = False
+  '''''''''''''''''''''''''''''''''''''''''''''''
+  If MSComm1.PortOpen = True Then
+     MSComm1.PortOpen = False
+     MsgBox "端口已被占用！"
+  Else
+     MSComm1.PortOpen = True          ' 打开串口
+     portled.FillColor = QBColor(10)
+  End If
+  If MSComm1.PortOpen = False Then
+     portled.FillColor = QBColor(8)
+     portswitch.Caption = "打开串口"
+  Else
+     portled.FillColor = QBColor(10)
+     portswitch.Caption = "关闭串口"
+  End If
+  
+  ComboPort.Text = "COM1"
+  Cmdpause.Enabled = False
+  j = 0
+  linkerrorcount = 0
+  LEDprocess = &HFF
+  ledback1 = &HF
+  ledback2 = &HF
+  '''''''''''''''''''''''''''''
+  outbuff(0) = ASCII_SOH
+  outbuff(1) = stationNum
+  outbuff(2) = ASCII_ENQ
+  outbuff(7) = ASCII_ETX
+  ''''''''''''''''''''''4字节数据
+  OUTdataA = "L"
+  OUTdataB = "\"
+  OUTdataC = "\"
+  OUTdataD = "\"
+  Call sendFirstbyte ''''''''''''''
+
+End Sub
+
+Private Sub MScomm1_OnComm()
+
+  Select Case MSComm1.CommEvent
+    Case comEvReceive
+    
+      inbuff = MSComm1.Input
+    
+      If inbuff(0) = &H16 Then  'SYN'每发送8字节就有收到7个“空转同步”握手标志用作检测单片机串口是否已经准备接收
+                             '''''发送下一字节'
+        If j <= 7 Then         '没收到8个字节
+          j = j + 1
+          MSComm1.Output = outdata(j) '发送下一字节数据''''''''
+          If j = 7 Then               '发送完8字节
+            j = 0
+          End If
+          Exit Sub                     '退出子程序
+        Else
+          j = 0
+          thing = "接收超过8字节" ''报故障
+          Call record
+        End If
+      '''''''''''不是8字节间的握手标志（已发送8字节数据）
+      Else
+        j = 0
+        
+        indata = Chr(inbuff(3)) + Chr(inbuff(4)) + Chr(inbuff(5)) + Chr(inbuff(6))
+        If inbuff(0) <> &H1 Then          '没收到SOH
+          thing = "没收到SOH"             ''报故障
+          Call record
+          Exit Sub                        '退出子程序
+        ElseIf inbuff(7) <> &H3 Then      '没收到ETX
+           thing = "没收到ETX"            ''报故障
+           Call record
+           Exit Sub                       '退出子程序
+          ElseIf inbuff(2) = &H15 Then    '收到NAK
+             'thing = "发送:" + outdata(3) + outdata(4) + outdata(5) + outdata(6)
+             'Call record
+             'thing = "接收:" + indata
+             'Call record
+             'thing = "发送数据产生冲突！" ''报故障
+             'Call record
+             Call resendFirstbyte
+             Exit Sub                     '退出子程序
+            ElseIf inbuff(2) <> &H6 Then  '没收到ACK
+               thing = "没收到ACK和NAK"   ''报故障
+               Call record
+               Exit Sub                   '退出子程序
+              Else                        '收到ACK
+                                          '收到SOH+ACK+ETX
+         End If
+         
+'''''''''''''''''''''''''''''''''''' 接收4字节数据区
+        Select Case indata
+        
+       '-------------系统初始化----------------
+       ''''连接成功信号
+          Case "RL\\"
+
+            startsign = False
+            OUTdataA = "S"  '发送 开始信号
+            OUTdataB = "\"
+            OUTdataC = "\"
+            OUTdataD = "\"
+            Call sendFirstbyte
+            linkerrorcount = 0
+            lablink.Caption = "连接正常！"
+            lablink.ForeColor = QBColor(2)
+       ''''就绪信号
+          Case "R" & "R" & Chr(inbuff(5)) & "\"
+            
+            ledback1 = inbuff(5)
+            Call ledreback
+            linkerrorcount = 0
+            thing = "系统已就绪"
+            Call record
+       '-------------脱机运行/退出系统------------
+       ''''脱机成功信号
+          Case "RS\\"
+          
+            linkerrorcount = 0
+            If MSComm1.PortOpen = True Then
+              Timer3.Enabled = False
+              If MSComm1.PortOpen = True Then
+                MSComm1.PortOpen = False        '''''关闭串口
+              End If
+              portled.FillColor = QBColor(8)
+              portswitch.Caption = "打开串口"
+            End If
+            If Cmdofflink.Enabled = True Then
+              End ''''''''''''
+            Else
+              Call clearallkey
+              thing = "关闭串口"
+              Call record '''''''''''''''发送命令
+              thing = "脱机成功，设备已断开连接"
+              Call record
+              lablink.Caption = "等待连接"
+            End If
+       '-------------通信状态检测与信息反馈------------
+          Case "F" & Chr(inbuff(4)) & "\" & "\"
+                        
+            ledback1 = inbuff(4)
+            Call ledreback
+            lablink.Caption = "连接正常！"
+            lablink.ForeColor = QBColor(2)
+            linkerrorcount = 0
+            If signmsg = False Then
+              signmsg = True
+              startsign = False
+              thing = "通信已恢复！"
+              Call record
+              MsgBox "设备与PC通信已恢复！", vbExclamation, "信息提示"
+            Else
+              If startsign = True Then
+                startsign = False
+                thing = "系统已就绪！"
+                Call record
+              End If
+            End If
+       '------------校验信息-------------
+          Case "I" & OUTdataB & OUTdataC & OUTdataD ''''''校验语句
+            
+            ledback1 = inbuff(5) * 16 + inbuff(6)
+            If Asc(OUTdataB) = 0 Then                  'LED亮操作
+              ledback1 = ledback1 And ledback2
+            ElseIf Asc(OUTdataB) = 1 Then              'LED灭操作
+              ledback1 = ledback1 Or ledback2
+            End If
+            Call ledreback
+            OUTdataA = "A"       '发送 允许执行信号
+            OUTdataB = "A"
+            OUTdataC = "A"
+            OUTdataD = "A"
+            Call sendFirstbyte
+            thing = "命令已接收！"
+            Call record
+     ''''''''''''''''''''''''''''
+          Case Else
+            Call linkerror
+        ''''''''''
+        End Select
+  '''''''''''''''''''''''
+      End If
+    
+    Case comEvSend
+
+  End Select
+
+  MSComm1.OutBufferCount = 0 '清空发送缓冲区
+  
+End Sub
+Public Sub ledreback()
+  ''''''''''LED状态反馈''''''''''
+  ledback2 = ledback1
+  ''''''整除'''''''   ''''''求余''''''
+  b0 = (ledback2) \ 2: yu0 = (ledback2) Mod 2
+  b1 = b0 \ 2: yu1 = b0 Mod 2
+  b2 = b1 \ 2: yu2 = b1 Mod 2
+  b3 = b2 \ 2: yu3 = b2 Mod 2
+  b4 = b3 \ 2: yu4 = b3 Mod 2
+  b5 = b4 \ 2: yu5 = b4 Mod 2
+  b6 = b5 \ 2: yu6 = b5 Mod 2
+  b7 = b6 \ 2: yu7 = b6 Mod 2
+  thing = "收到LED状态" & yu7 & yu6 & yu5 & yu4 & yu3 & yu2 & yu1 & yu0
+  Call record                        '
+  '''''''''LED1状态'''''''''
+  If yu0 = 0 Then
+    ShapeLED1.FillColor = QBColor(12)
+    FrameLED1.Caption = "LED1亮"
+    FrameLED1.ForeColor = QBColor(12)
+    CmdL1bright.Enabled = False
+    CmdL1die.Enabled = True
+  ElseIf yu0 = 1 Then
+    ShapeLED1.FillColor = QBColor(8)
+    FrameLED1.Caption = "LED1灭"
+    FrameLED1.ForeColor = QBColor(0)
+    CmdL1bright.Enabled = True
+    CmdL1die.Enabled = False
+  End If
+  '''''''''LED2状态'''''''''
+  If yu1 = 0 Then
+    ShapeLED2.FillColor = QBColor(12)
+    FrameLED2.Caption = "LED2亮"
+    FrameLED2.ForeColor = QBColor(12)
+    CmdL2bright.Enabled = False
+    CmdL2die.Enabled = True
+  ElseIf yu1 = 1 Then
+    ShapeLED2.FillColor = QBColor(8)
+    FrameLED2.Caption = "LED2灭"
+    FrameLED2.ForeColor = QBColor(0)
+    CmdL2bright.Enabled = True
+    CmdL2die.Enabled = False
+  End If
+  '''''''''LED3状态'''''''''
+  If yu2 = 0 Then
+    ShapeLED3.FillColor = QBColor(12)
+    FrameLED3.Caption = "LED3亮"
+    FrameLED3.ForeColor = QBColor(12)
+    CmdL3bright.Enabled = False
+    CmdL3die.Enabled = True
+  ElseIf yu2 = 1 Then
+    ShapeLED3.FillColor = QBColor(8)
+    FrameLED3.Caption = "LED3灭"
+    FrameLED3.ForeColor = QBColor(0)
+    CmdL3bright.Enabled = True
+    CmdL3die.Enabled = False
+  End If
+  '''''''''LED4状态'''''''''
+  If yu3 = 0 Then
+    ShapeLED4.FillColor = QBColor(12)
+    FrameLED4.Caption = "LED4亮"
+    FrameLED4.ForeColor = QBColor(12)
+    CmdL4bright.Enabled = False
+    CmdL4die.Enabled = True
+  ElseIf yu3 = 1 Then
+    ShapeLED4.FillColor = QBColor(8)
+    FrameLED4.Caption = "LED4灭"
+    FrameLED4.ForeColor = QBColor(0)
+    CmdL4bright.Enabled = True
+    CmdL4die.Enabled = False
+  End If
+  '''''''''LED5状态'''''''''
+  If yu4 = 0 Then
+    ShapeLED5.FillColor = QBColor(12)
+    FrameLED5.Caption = "LED5亮"
+    FrameLED5.ForeColor = QBColor(12)
+    CmdL5bright.Enabled = False
+    CmdL5die.Enabled = True
+  ElseIf yu4 = 1 Then
+    ShapeLED5.FillColor = QBColor(8)
+    FrameLED5.Caption = "LED5灭"
+    FrameLED5.ForeColor = QBColor(0)
+    CmdL5bright.Enabled = True
+    CmdL5die.Enabled = False
+  End If
+  '''''''''LED6状态'''''''''
+  If yu5 = 0 Then
+    ShapeLED6.FillColor = QBColor(12)
+    FrameLED6.Caption = "LED6亮"
+    FrameLED6.ForeColor = QBColor(12)
+    CmdL6bright.Enabled = False
+    CmdL6die.Enabled = True
+  ElseIf yu5 = 1 Then
+    ShapeLED6.FillColor = QBColor(8)
+    FrameLED6.Caption = "LED6灭"
+    FrameLED6.ForeColor = QBColor(0)
+    CmdL6bright.Enabled = True
+    CmdL6die.Enabled = False
+  End If
+ '''''''''LED7状态'''''''''
+  If yu6 = 0 Then
+    ShapeLED7.FillColor = QBColor(12)
+    FrameLED7.Caption = "LED7亮"
+    FrameLED7.ForeColor = QBColor(12)
+    CmdL7bright.Enabled = False
+    CmdL7die.Enabled = True
+  ElseIf yu6 = 1 Then
+    ShapeLED7.FillColor = QBColor(8)
+    FrameLED7.Caption = "LED7灭"
+    FrameLED7.ForeColor = QBColor(0)
+    CmdL7bright.Enabled = True
+    CmdL7die.Enabled = False
+  End If
+  '''''''''LED8状态'''''''''
+  If yu7 = 0 Then
+    ShapeLED8.FillColor = QBColor(12)
+    FrameLED8.Caption = "LED8亮"
+    FrameLED8.ForeColor = QBColor(12)
+    CmdL8bright.Enabled = False
+    CmdL8die.Enabled = True
+  ElseIf yu7 = 1 Then
+    ShapeLED8.FillColor = QBColor(8)
+    FrameLED8.Caption = "LED8灭"
+    FrameLED8.ForeColor = QBColor(0)
+    CmdL8bright.Enabled = True
+    CmdL8die.Enabled = False
+  End If
+
+End Sub
+Public Sub sendFirstbyte()
+
+  outbuff(3) = OUTdataA
+  outbuff(4) = OUTdataB
+  outbuff(5) = OUTdataC
+  outbuff(6) = OUTdataD
+  outdata(0) = outbuff(0)
+  outdata(1) = outbuff(1)
+  outdata(2) = outbuff(2)
+  outdata(3) = outbuff(3)
+  outdata(4) = outbuff(4)
+  outdata(5) = outbuff(5)
+  outdata(6) = outbuff(6)
+  outdata(7) = outbuff(7)
+  
+  'If MSComm1.PortOpen = True Then
+    MSComm1.Output = outdata(0) '发送数据首字节
+  'End If
+  
+End Sub
+Public Sub resendFirstbyte()        '重新发送子程序
+
+  MSComm1.Output = outdata(0)
+  'thing = "重新发送" + outdata(3) + outdata(4) + outdata(5) + outdata(6)
+  'Call record
+End Sub
+
+Private Sub SliderDelay_Scroll() '''调节延时时间
+  
+  Select Case SliderDelay.Value ''''''''延时时间＝delay×50ms
+    Case 1
+      Labeldelaytime = 100 & "ms"
+      delaytime = 2
+    Case 2
+      Labeldelaytime = 200 & "ms"
+      delaytime = 4
+    Case 3
+      Labeldelaytime = 500 & "ms"
+      delaytime = 10
+    Case 4
+      Labeldelaytime = 1 & "S"
+      delaytime = 20
+    Case 5
+      Labeldelaytime = 1.5 & "S"
+      delaytime = 30
+    Case 6
+      Labeldelaytime = 2 & "S"
+      delaytime = 40
+    Case 7
+      Labeldelaytime = 2.5 & "S"
+      delaytime = 50
+    Case 8
+      Labeldelaytime = 3 & "S"
+      delaytime = 60
+    Case 9
+      Labeldelaytime = 3.5 & "S"
+      delaytime = 70
+    Case 10
+      Labeldelaytime = 4 & "S"
+      delaytime = 80
+    Case 11
+      Labeldelaytime = 5 & "S"
+      delaytime = 100
+    End Select
+  If Cmdpause.Enabled = True Then
+    Cmdpause.Value = True
+  End If
+      
+  Cmdturn.ToolTipText = "LED延时" & Labeldelaytime
+  Cmdsundry.ToolTipText = "LED延时" & Labeldelaytime
+  Cmdflash.ToolTipText = "LED延时" & Labeldelaytime
+      
+End Sub
+
+Private Sub Clear_autoLED()
+
+  Cmdflash.Enabled = True
+  Cmdflash.BackColor = &H8000000F
+  Cmdsundry.Enabled = True
+  Cmdsundry.BackColor = &H8000000F
+  Cmdturn.Enabled = True
+  Cmdturn.BackColor = &H8000000F
+  
+End Sub
+Private Sub clearallkey()
+
+  CmdL1bright.Enabled = False
+  CmdL1die.Enabled = False
+  CmdL2bright.Enabled = False
+  CmdL2die.Enabled = False
+  CmdL3bright.Enabled = False
+  CmdL3die.Enabled = False
+  CmdL4bright.Enabled = False
+  CmdL4die.Enabled = False
+  CmdL5bright.Enabled = False
+  CmdL5die.Enabled = False
+  CmdL6bright.Enabled = False
+  CmdL6die.Enabled = False
+  CmdL7bright.Enabled = False
+  CmdL7die.Enabled = False
+  CmdL8bright.Enabled = False
+  CmdL8die.Enabled = False
+  CmdAllbright.Enabled = False
+  CmdAlldie.Enabled = False
+  
+  
+  
+End Sub
+
+Private Sub Textthing_Change()
+    If Textthing.Text = "" Then
+    Cmdclear.Enabled = False
+  Else
+    Cmdclear.Enabled = True
+  End If
+End Sub
+
+Private Sub Timer1_Timer()  '加载时间
+  
+  lbltime.FontSize = 15
+  lbltime.Caption = Time()
+  
+  If Cmdofflink.Enabled = False Then    ''''脱机按钮闪烁
+    If offlinkSign = True Then
+      offlinkSign = False
+      Cmdofflink.BackColor = QBColor(12)
+    Else
+      Cmdofflink.BackColor = QBColor(2)
+      offlinkSign = True
+    End If
+  Else
+    Cmdofflink.BackColor = &H8000000F
+    offlinkSign = True
+  End If
+  
+  If lablink.Caption = "连接失败！" Then '''' "连接失败！"颜色交替变化
+    If lablinkSign = True Then
+      lablinkSign = False
+      lablink.ForeColor = QBColor(12)
+    Else
+      lablinkSign = True
+      lablink.ForeColor = QBColor(10)
+    End If
+  End If
+  
+  
+End Sub
+
+Private Sub Timer2_Timer() '100ms检测时间间隔、端口状态
+
+  f = Timer3.Interval / 1000
+  Labelsampling.Caption = "状态检测时间间隔：" & f & "秒"
+  Labelsampling.ForeColor = &H800000
+  
+  If MSComm1.PortOpen = True Then
+    portswitch.ToolTipText = "端口已打开"
+  Else
+    portswitch.ToolTipText = "端口已关闭"
+  End If
+  
+  
+End Sub
+
+Private Sub Timer3_Timer() '每3秒检查通信状态
+
+  Dim bDT As Boolean
+  Dim sPrevious As Single
+  bDT = True
+  sPrevious = Timer
+   '''''''''''''''''''检查空闲状态语句
+  If MSComm1.InBufferCount = 0 Then
+    Do While bDT
+    If Timer - sPrevious >= 0.1 Then bDT = False '0.1延时确保系统在空闲状态
+    Loop
+    bDT = True
+    If MSComm1.InBufferCount = 0 Then
+      ''''''''''''''''''''''''''''''''发送通信状态检测信号
+      OUTdataA = "C"
+      MSComm1.Output = OUTdataA
+      'OUTdataB = "\"       '''''''减少发送代码节省数据传送的时间
+      'OUTdataC = "\"
+      'OUTdataD = "\"
+      'Call sendFirstbyte
+     ''''''''''''''''''''''''延时等待接收数据
+      Do While bDT
+      If Timer - sPrevious >= 0.2 Then bDT = False '0.2修改此参数会影响检测通信结果
+      Loop
+      bDT = True
+      If MSComm1.InBufferCount = 0 Then
+        lablink.ForeColor = QBColor(12)
+        lablink.Caption = "连接失败！"
+        If signmsg = True Then
+          thing = "PC与设备通信被中断！"
+          Call record
+          ret = MsgBox("PC与设备通信被中断！", 5 + 48 + 256, "故障提示")
+          If ret = 4 Then
+            relink.Value = True
+          End If
+          signmsg = False
+        End If
+      End If
+    End If
+  End If
+  
+End Sub
+

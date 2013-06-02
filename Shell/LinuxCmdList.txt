@@ -1,0 +1,16 @@
+strace/tcpdump
+profile
+make/automack
+conf/autoconf
+expect
+getcwd
+readlink
+paste
+sort -s Œ»∂®≈≈–Ú
+readelf 
+
+ info coreutils 'Opening the software toolbox'
+
+xp: find
+
+set vs shopt

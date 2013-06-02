@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+# Func: Generate the test files defined in filesList in current path
+#
+# Usage:
+#	generateTestFiles 
+
+cat filesList | xargs touch

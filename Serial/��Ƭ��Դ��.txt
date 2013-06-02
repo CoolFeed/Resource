@@ -1,0 +1,374 @@
+   BZ    BIT  P3.3
+   DISP  EQU  P1
+INBUFF   EQU  30H
+INBUFF1  EQU  31H
+INBUFF2  EQU  32H
+INBUFF3  EQU  33H
+INBUFF4  EQU  34H
+INBUFF5  EQU  35H
+INBUFF6  EQU  36H
+INBUFF7  EQU  37H
+INBUFF8  EQU  38H
+INDATA_A EQU  39H
+INDATA_B EQU  40H
+INDATA_C EQU  41H
+INDATA_D EQU  42H
+OUTBUFF  EQU  43H
+
+OUTDATA1 EQU  44H
+OUTDATA2 EQU  45H
+OUTDATA3 EQU  46H
+OUTDATA4 EQU  47H
+OUTDATA5 EQU  48H
+OUTDATA6 EQU  49H
+OUTDATA7 EQU  4AH
+OUTDATA8 EQU  4BH
+OUTDATA_A EQU 4CH
+OUTDATA_B EQU 4DH
+OUTDATA_C EQU 4EH
+OUTDATA_D EQU 4FH
+
+S_AMOUNT EQU  50H
+R_AMOUNT EQU  51H
+R_COUNT  EQU  52H
+R_COUNTb EQU  53H
+R_COUNTs EQU  54H
+R_COUNTg EQU  55H
+MYADD    EQU  56H
+    LED  EQU  57H
+  DATAA  EQU  20H
+  DATAB  EQU  21H
+  DATAC  EQU  22H
+  DATAD  EQU  23H
+LEDDATA  EQU  24H
+DEL_TIME1 EQU  25H
+DEL_TIME2 EQU  26H
+LED_STYLE EQU  27H
+
+       ORG   0000H
+       LJMP  START
+       ORG   000BH
+       LJMP  TIMER0
+       ORG   0023H
+       LJMP  RI_TI
+
+       ORG   0100H
+START: MOV   SP ,#60H
+       MOV   SCON,#0D0H;设置成串口工作方式3
+       MOV   TMOD,#21H ;波特率发生器T1工作在模式2
+       MOV   PCON,#80H ;波特率翻倍为4800*2=9600bps
+       MOV   TH0,#3CH
+       MOV   TL0,#0B0H
+       MOV   TH1,#0FAH ;预置初值(按照波特率4800bps预置初值)
+       MOV   TL1,#0FAH ;预置初值(按照波特率4800bps预置初值)
+       MOV   IE,#92H
+       SETB  PS        ;串口中断优先
+       SETB  TR1       ;启动定时器T1
+       MOV   MYADD,#01H
+       MOV   R_COUNT,#0
+       MOV   R_AMOUNT,#8
+       MOV   R0,#INBUFF1
+       MOV   R_COUNTb,#30H
+       MOV   R_COUNTs,#30H
+       MOV   R_COUNTg,#30H
+       MOV   INBUFF1,#94;
+       MOV   INBUFF2,#94;
+       MOV   INBUFF3,#94;
+       MOV   INBUFF4,#94;
+       MOV   LED,#00H
+       MOV   DEL_TIME1,#2
+       MOV   DEL_TIME2,#2
+       MOV   LED_STYLE,#0
+       LCALL BELL
+       MOV   LEDDATA,#0FFH;SETB  LED
+;========初始化显示器
+       MOV    DISP,#0FFH
+       LJMP   $
+
+;=======================
+TIMER0:PUSH   PSW
+       PUSH   ACC
+       MOV    TH0,#3CH
+       MOV    TL0,#0B0H
+       DJNZ   DEL_TIME1,OUT_T0
+       MOV    DEL_TIME1,DEL_TIME2
+T0_TURN:
+       MOV    A,#1
+       CJNE   A,LED_STYLE,T0_SUNDRY
+       MOV    A,DISP
+       RL     A
+       MOV    DISP,A
+       JMP    OUT_T0
+T0_SUNDRY:
+       MOV    A,#2
+       CJNE   A,LED_STYLE,T0_FLASH
+       MOV    A,DISP
+       CPL    A
+       MOV    DISP,A
+       JMP    OUT_T0
+T0_FLASH:
+       MOV    A,#3
+       CJNE   A,LED_STYLE,OUT_T0
+       MOV    A,DISP
+       CPL    A
+       MOV    DISP,A
+
+OUT_T0:POP    PSW
+       POP    ACC
+       RETI
+
+;========发送子程序==========
+SEND_BYTE:
+       MOV   S_AMOUNT,#8
+       MOV   R1,#OUTDATA1
+SEND_BIT:
+       MOV   A,@R1
+       MOV   SBUF,A
+       JNB   TI,$
+       CLR   TI
+       DJNZ  S_AMOUNT,SENDNEXT
+       RET
+
+SENDNEXT:
+       INC   R1
+       LJMP  SEND_BIT
+
+;=======指令比较==============
+ORDER_COMP:
+;=======收到连接信号
+        MOV   A,#4CH              ;"L"
+        CJNE  A,INDATA_A,OR_START
+        MOV   A,#5CH              ;"\"
+        CJNE  A,INDATA_B,OR_START
+        MOV   A,#5CH              ;"\"
+        CJNE  A,INDATA_C,OR_START
+        MOV   A,#5CH              ;"\"
+        CJNE  A,INDATA_D,OR_START
+;-------发送连接成功信号
+        MOV   OUTDATA_A,#52H;"R"
+        MOV   OUTDATA_B,#4CH;"L"
+        MOV   OUTDATA_C,#5CH;"\"
+        MOV   OUTDATA_D,#5CH;"\"
+        LCALL PACK
+        RET
+;=======收到开始信号
+OR_START:
+        MOV   A,#53H              ;"S"
+        CJNE  A,INDATA_A,OR_OFFLINK
+        MOV   A,#5CH              ;"\"
+        CJNE  A,INDATA_B,OR_OFFLINK
+        MOV   A,#5CH              ;"\"
+        CJNE  A,INDATA_C,OR_OFFLINK
+        MOV   A,#5CH              ;"\"
+        CJNE  A,INDATA_D,OR_OFFLINK
+;-------发送系统就绪信号
+        MOV   OUTDATA_A,#52H;"R"
+        MOV   OUTDATA_B,#52H;"R"
+        MOV   OUTDATA_C,DISP;#5CH;"\"
+        MOV   OUTDATA_D,#5CH;"\"
+        LCALL PACK
+        RET
+;=======收到脱机信号
+OR_OFFLINK:
+        MOV   A,#4FH              ;"O"
+        CJNE  A,INDATA_A,OR_INFOR
+        MOV   A,#5CH              ;"\"
+        CJNE  A,INDATA_B,OR_INFOR
+        MOV   A,#5CH              ;"\"
+        CJNE  A,INDATA_C,OR_INFOR
+        MOV   A,#5CH              ;"\"
+        CJNE  A,INDATA_D,OR_INFOR
+;-------发送脱机成功信号
+        MOV   OUTDATA_A,#52H;"R"
+        MOV   OUTDATA_B,#53H;"S"
+        MOV   OUTDATA_C,#5CH;"\"
+        MOV   OUTDATA_D,#5CH;"\"
+        LCALL PACK
+        RET
+;=======收到命令信息
+OR_INFOR:
+        MOV   A,#57H              ;"W"
+        CJNE  A,INDATA_A,OR_ALLOW
+;-------发送校验信息
+        MOV   OUTDATA_A,#49H      ;"I"
+        MOV   OUTDATA_B,INDATA_B
+        MOV   OUTDATA_C,INDATA_C
+        MOV   OUTDATA_D,INDATA_D
+;-------保存信息
+        MOV   DATAA,INDATA_A
+        MOV   DATAB,INDATA_B
+        MOV   DATAC,INDATA_C
+        MOV   DATAD,INDATA_D
+        LCALL PACK
+        RET
+;=======收到允许执行信号
+OR_ALLOW:
+        MOV   A,#41H              ;"A"
+        CJNE  A,INDATA_A,OR_CLICK
+        MOV   A,#41H              ;"A"
+        CJNE  A,INDATA_B,OR_CLICK
+        MOV   A,#41H              ;"A"
+        CJNE  A,INDATA_C,OR_CLICK
+        MOV   A,#41H              ;"A"
+        CJNE  A,INDATA_D,OR_CLICK
+;---------------------------------
+        MOV   A,DATAC
+        ANL   A,#0FH
+        SWAP  A
+        ANL   DATAD,#0FH
+        ADD   A,DATAD
+        MOV   LEDDATA,A           ;2位数据合并成1位
+ ON_LED:MOV   A,#00H              ;点亮LED
+        CJNE  A,DATAB,OFF_LED
+        CLR   TR0
+        MOV   A,LEDDATA
+        ANL   A,DISP
+        MOV   DISP,A              ;低电平点亮LED
+        LJMP  OUT_LED
+OFF_LED:MOV   A,#01H
+        CJNE  A,DATAB,FLASH_LED
+        CLR   TR0
+        MOV   A,LEDDATA
+        ORL   A,DISP
+        MOV   DISP,A              ;低电平点亮LED
+        LJMP  OUT_LED
+
+OR_CLICK:
+        LJMP  ERROR
+
+FLASH_LED:
+        MOV   A,#46H    ;"F"
+        CJNE  A,DATAB,SUNDRY_LED
+        MOV   DISP,#00H
+        MOV   DEL_TIME1,DATAC
+        MOV   DEL_TIME2,DATAC
+        SETB  TR0
+        MOV   DISP,#00H
+        MOV   LED_STYLE,#3
+        LJMP  OUT_LED
+SUNDRY_LED:
+        MOV   A,#53H    ;"S"
+        CJNE  A,DATAB,TURN_LED
+        MOV   DISP,#01010101B
+        MOV   DEL_TIME1,DATAC
+        MOV   DEL_TIME2,DATAC
+        SETB  TR0
+        MOV   DISP,#01010101B
+        MOV   LED_STYLE,#2
+        LJMP  OUT_LED
+TURN_LED:
+        MOV   A,#54H    ;"T"
+        CJNE  A,DATAB,PAUSE_LED
+        MOV   DISP,#0FEH
+        MOV   DEL_TIME1,DATAC
+        MOV   DEL_TIME2,DATAC
+        SETB  TR0
+        MOV   DISP,#0FEH
+        MOV   LED_STYLE,#1
+        LJMP  OUT_LED
+PAUSE_LED:
+        MOV   A,#50H    ;"P"
+        CJNE  A,DATAB,OUT_LED
+        ;MOV   DEL_TIME,DATAC
+        CLR   TR0
+OUT_LED :
+        NOP
+        RET
+
+;=======收到XX信号
+;=======收到XX信号
+
+;=======打包8字节数据后发送==========
+ PACK:  MOV   OUTDATA1,#01H     ;"SOH"
+        MOV   OUTDATA2,MYADD    ;站号
+        MOV   OUTDATA3,#06H     ;"ACK"
+        MOV   OUTDATA4,OUTDATA_A;接收的数据
+        MOV   OUTDATA5,OUTDATA_B;
+        MOV   OUTDATA6,OUTDATA_C;
+        MOV   OUTDATA7,OUTDATA_D;
+        MOV   OUTDATA8,#03H     ;"ETX"
+        LCALL SEND_BYTE
+        RET
+
+  ERROR:
+;=======发送无效信息
+        MOV   OUTDATA1,#01H ;"SOH"
+        MOV   OUTDATA2,MYADD;站号
+        MOV   OUTDATA3,#15H ;"NAK"
+        MOV   OUTDATA4,INDATA_A ;"?"数据
+        MOV   OUTDATA5,INDATA_B ;"?"
+        MOV   OUTDATA6,INDATA_C ;"?"
+        MOV   OUTDATA7,INDATA_D ;"?"
+        MOV   OUTDATA8,#03H ;"ETX"
+        LCALL SEND_BYTE
+        LJMP  ENDT
+
+;=====串口中断处理子程序===========
+RI_TI:  PUSH  PSW              ;
+        PUSH  ACC
+        JBC   RI,RECEIVE;;;;;
+        CLR   RI
+        CLR   TI        ;;;;
+        LJMP  ENDT
+RECEIVE:MOV   A,SBUF
+        MOV   @R0,A
+        DJNZ  R_AMOUNT,NEXTIN   ;8字节接收完毕?
+        MOV   R_AMOUNT,#8
+        MOV   R0,#INBUFF1
+;=======比较接收到的8字节数据
+        MOV   A,INBUFF1
+        CJNE  A,#01H,ERROR;"SOH"
+        MOV   A,INBUFF2
+        CJNE  A,MYADD,ERROR;站号
+        MOV   A,INBUFF3
+        CJNE  A,#05H,ERROR;"ENQ"
+        MOV   A,INBUFF8
+        CJNE  A,#03H,ERROR;"ETX"
+        MOV   INDATA_A,INBUFF4
+        MOV   INDATA_B,INBUFF5
+        MOV   INDATA_C,INBUFF6
+        MOV   INDATA_D,INBUFF7
+        LCALL ORDER_COMP; 指令比较
+        LCALL BELL
+  ENDT: POP   ACC
+        POP   PSW
+        RETI
+
+NEXTIN: CJNE  R0,#INBUFF1,RI_NEXT;收到第一字?
+        MOV   A,@R0
+;-------收到检测信号
+        CJNE  A,#43H,RI_NEXT    ;收到的第一字节是"C"?
+;-------发送回应8字节数据
+        MOV   OUTDATA_A,#46H  ;"F"
+        MOV   OUTDATA_B,DISP
+        MOV   OUTDATA_C,#5CH;"\"
+        MOV   OUTDATA_D,#5CH;"\"
+        LCALL PACK
+        LJMP  ENDT
+RI_NEXT:INC   R0
+;=======接收到一字节后发送同步空转标志
+        MOV   A,#16H
+        MOV   SBUF,A ;每收到8字节就发送7个同步空转
+        LJMP  ENDT
+
+DISPLAY:
+
+;-----接收次数
+
+      RET
+;=================================
+BELL: CLR    BZ
+      LCALL  DEL_10MS
+      SETB   BZ
+      RET
+
+;======10毫秒延时子程序
+DEL_10MS: MOV   R6,#2
+   D10MS: MOV   R7,#50
+          DJNZ  R7,$
+          DJNZ  R6,D10MS
+          RET
+
+
+
+       END

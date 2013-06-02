@@ -1,0 +1,18 @@
+标  题: 看到一个技巧，两段的尾合并 
+发信站: 水木社区 (Fri Jun 29 19:08:59 2012), 站内 
+  
+aaa 
+bbb 
+ccc 
+111 
+222 
+333 
+合并成 
+aaa 111 
+bbb 222 
+ccc 333 
+光标放到ccc行 
+:1,g/^/''+m. | -j 
+
+./startManagedWebLogic.sh LT t3://localhost:7001
+http://www.newsmth.net/nForum/#!article/VIM/64645?p=2
