@@ -1,4 +1,4 @@
-package java.basic;
+package gerry.java.basic;
 
 /**
  * 位向量排序，O(n),O(n)时间空间复杂度，如何生成不重复的随机数？

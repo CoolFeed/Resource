@@ -1,4 +1,4 @@
-package java.basic;
+package gerry.java.basic;
 
 class test {
 

@@ -1,0 +1,10 @@
+Thread safe control
+1. synchronize code block
+2. synchronize method
+3. lock
+4. wait/notify/notify all
+5. final
+
+IOC: reflection
+
+AOP: JDK interface proxy delegate/CGLib children proxy

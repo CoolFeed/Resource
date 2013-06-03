@@ -1,4 +1,4 @@
-package java.basic;
+package gerry.java.basic;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class JavaBasic {

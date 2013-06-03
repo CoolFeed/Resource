@@ -1,4 +1,4 @@
-package java.basic;
+package gerry.java.basic;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
